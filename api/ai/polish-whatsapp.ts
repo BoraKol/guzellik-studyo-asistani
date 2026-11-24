@@ -1,9 +1,9 @@
-import { polishWhatsAppMessage } from '../../server/ai/whatsappPolisher';
+import { polishWhatsAppMessage } from '../../server/ai/whatsappPolisher.js';
 import {
   parseRequestBody,
   toPublicErrorResponse,
-} from '../../server/http/parseBody';
-import { applySecurityHeaders } from '../../server/http/securityHeaders';
+} from '../../server/http/parseBody.js';
+import { applySecurityHeaders } from '../../server/http/securityHeaders.js';
 
 interface ServerlessRequest {
   method?: string;

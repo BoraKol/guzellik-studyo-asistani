@@ -8,11 +8,13 @@ let envLoaded = false;
 
 /**
  * Loads `.env.local` first (matching Vite precedence) and falls back to `.env`.
- * Existing process environment variables (e.g. Vercel / container secrets) are never overwritten.
+ * Skips filesystem reads on Vercel where environment variables are injected natively.
  */
 export function loadServerEnv(): void {
   if (envLoaded) return;
   envLoaded = true;
+
+  if (process.env.VERCEL) return;
 
   const cwd = process.cwd();
   const candidates = ['.env.local', '.env'];

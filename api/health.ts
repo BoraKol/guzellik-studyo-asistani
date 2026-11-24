@@ -1,5 +1,5 @@
-import { getServerConfig } from '../server/config/env';
-import { applySecurityHeaders } from '../server/http/securityHeaders';
+import { getServerConfig } from '../server/config/env.js';
+import { applySecurityHeaders } from '../server/http/securityHeaders.js';
 
 interface ServerlessRequest {
   method?: string;

@@ -1,9 +1,9 @@
-import { parseSessionNote } from '../../server/ai/sessionParser';
+import { parseSessionNote } from '../../server/ai/sessionParser.js';
 import {
   parseRequestBody,
   toPublicErrorResponse,
-} from '../../server/http/parseBody';
-import { applySecurityHeaders } from '../../server/http/securityHeaders';
+} from '../../server/http/parseBody.js';
+import { applySecurityHeaders } from '../../server/http/securityHeaders.js';
 
 interface ServerlessRequest {
   method?: string;
