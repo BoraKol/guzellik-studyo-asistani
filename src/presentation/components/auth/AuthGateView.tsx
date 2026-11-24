@@ -11,7 +11,6 @@ import {
   CalendarCheck2,
   Eye,
   EyeOff,
-  Flower2,
   HeartHandshake,
   Instagram,
   Mail,
@@ -20,6 +19,7 @@ import {
   getFirebaseAuth,
   googleProvider,
 } from '../../../infrastructure/firebase/client';
+import { BrandIcon } from '../common/BrandIcon';
 
 type AuthMode = 'SIGN_IN' | 'SIGN_UP' | 'RESET';
 
@@ -168,9 +168,7 @@ export function AuthGateView() {
       <header className="w-full border-b border-[#E7E5E4] bg-[#FAF9F7]/90">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 h-14 sm:h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#2F5D50] text-white flex items-center justify-center shrink-0">
-              <Flower2 className="w-4 h-4" aria-hidden="true" />
-            </span>
+            <BrandIcon size="responsive" />
             <div className="min-w-0 leading-tight">
               <span className="block font-display text-base sm:text-lg font-semibold text-[#1C1917] whitespace-nowrap">
                 StüdyoAsistan

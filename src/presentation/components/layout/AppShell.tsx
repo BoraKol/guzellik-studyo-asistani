@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
-import { Flower2, LogOut, Plus, RotateCcw } from 'lucide-react';
+import { LogOut, Plus, RotateCcw } from 'lucide-react';
 import { SERVICE_FOCUS_LABELS } from '../../../domain/constants/studioLabels';
 import type {
   BioServiceGroup,
   NavTab,
   ServiceFocusFilter,
 } from '../../../domain/types/studio';
+import { BrandIcon } from '../common/BrandIcon';
 import { NAV_ITEMS, SERVICE_FOCUS_NAV_ITEMS } from './navigationConfig';
 
 interface AppShellProps {
@@ -45,9 +46,7 @@ export function AppShell({
       <aside className="no-print hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white border-r border-[#E7E5E4] z-30">
         <div className="px-5 py-5 border-b border-[#E7E5E4] space-y-2">
           <div className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-lg bg-[#2F5D50] text-white flex items-center justify-center shrink-0">
-              <Flower2 className="w-4 h-4" aria-hidden="true" />
-            </span>
+            <BrandIcon size="md" />
             <div className="min-w-0">
               <span className="block font-display text-lg font-semibold leading-tight tracking-tight text-[#1C1917] whitespace-nowrap">
                 StüdyoAsistan
@@ -167,9 +166,7 @@ export function AppShell({
           <div className="h-13 lg:h-14 px-3.5 sm:px-6 lg:px-8 flex items-center justify-between gap-2.5">
             <div className="flex items-center gap-2 min-w-0">
               <div className="lg:hidden flex items-center gap-2 min-w-0">
-                <span className="w-7 h-7 rounded-md bg-[#2F5D50] text-white flex items-center justify-center shrink-0">
-                  <Flower2 className="w-3.5 h-3.5" aria-hidden="true" />
-                </span>
+                <BrandIcon size="sm" />
                 <div className="min-w-0 leading-none">
                   <span className="block font-display text-sm font-semibold text-[#1C1917] truncate">
                     StüdyoAsistan

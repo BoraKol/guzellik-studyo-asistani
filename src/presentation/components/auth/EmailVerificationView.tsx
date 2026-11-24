@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { sendEmailVerification, signOut, type User } from 'firebase/auth';
-import { CheckCircle2, Flower2, MailCheck, RefreshCw } from 'lucide-react';
+import { CheckCircle2, MailCheck, RefreshCw } from 'lucide-react';
 import { getFirebaseAuth } from '../../../infrastructure/firebase/client';
+import { BrandIcon } from '../common/BrandIcon';
 
 interface EmailVerificationViewProps {
   user: User;
@@ -55,9 +56,7 @@ export function EmailVerificationView({ user, onVerified }: EmailVerificationVie
     <div className="min-h-dvh bg-[#FAF9F7] text-[#1C1917] flex flex-col justify-between p-5 sm:p-6 safe-pt safe-pb">
       <header className="max-w-5xl w-full mx-auto flex items-center justify-between py-2 gap-3">
         <div className="flex items-center gap-2.5">
-          <span className="w-8 h-8 rounded-lg bg-[#2F5D50] text-white flex items-center justify-center shrink-0">
-            <Flower2 className="w-4 h-4" aria-hidden="true" />
-          </span>
+          <BrandIcon size="md" />
           <span className="font-display text-lg font-semibold text-[#1C1917] whitespace-nowrap">
             StüdyoAsistan
           </span>

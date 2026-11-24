@@ -1,4 +1,5 @@
-import { Flower2, KeyRound } from 'lucide-react';
+import { KeyRound } from 'lucide-react';
+import { BrandIcon } from '../common/BrandIcon';
 
 interface FirebaseConfigMissingViewProps {
   missingKeys: readonly string[];
@@ -9,9 +10,7 @@ export function FirebaseConfigMissingView({ missingKeys }: FirebaseConfigMissing
     <div className="min-h-dvh bg-[#FAF9F7] text-[#1C1917] flex items-center justify-center p-5 sm:p-6">
       <div className="max-w-lg w-full bg-white border border-[#E7E5E4] rounded-2xl p-6 sm:p-8 space-y-5 shadow-xs">
         <div className="flex items-center gap-2.5">
-          <span className="w-9 h-9 rounded-lg bg-[#2F5D50] text-white flex items-center justify-center shrink-0">
-            <Flower2 className="w-4 h-4" aria-hidden="true" />
-          </span>
+          <BrandIcon size="lg" />
           <div>
             <h1 className="text-lg font-semibold text-[#1C1917]">
               Ortam Değişkenleri Eksik

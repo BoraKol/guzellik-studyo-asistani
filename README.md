@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./public/favicon.svg" alt="StüdyoAsistan Logo" width="72" height="72" />
+<img src="./public/app-icon.png" alt="StüdyoAsistan Logo" width="72" height="72" />
 
 # StüdyoAsistan
 
