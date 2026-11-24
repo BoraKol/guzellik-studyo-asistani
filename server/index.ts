@@ -1,12 +1,12 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseSessionNote } from './ai/sessionParser.ts';
-import { polishWhatsAppMessage } from './ai/whatsappPolisher.ts';
-import { getServerConfig } from './config/env.ts';
-import { parseRequestBody, toPublicErrorResponse } from './http/parseBody.ts';
-import { createRateLimiter } from './http/rateLimiter.ts';
-import { applySecurityHeaders } from './http/securityHeaders.ts';
+import { parseSessionNote } from './ai/sessionParser';
+import { polishWhatsAppMessage } from './ai/whatsappPolisher';
+import { getServerConfig } from './config/env';
+import { parseRequestBody, toPublicErrorResponse } from './http/parseBody';
+import { createRateLimiter } from './http/rateLimiter';
+import { applySecurityHeaders } from './http/securityHeaders';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

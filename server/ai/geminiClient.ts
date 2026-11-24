@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
-import { getServerConfig } from '../config/env.ts';
-import { HttpError } from '../http/parseBody.ts';
+import { getServerConfig } from '../config/env';
+import { HttpError } from '../http/parseBody';
 
 let cachedKey: string | null = null;
 let cachedClient: GoogleGenAI | null = null;

@@ -1,9 +1,9 @@
-import { parseSessionNote } from '../../server/ai/sessionParser.ts';
+import { parseSessionNote } from '../../server/ai/sessionParser';
 import {
   parseRequestBody,
   toPublicErrorResponse,
-} from '../../server/http/parseBody.ts';
-import { applySecurityHeaders } from '../../server/http/securityHeaders.ts';
+} from '../../server/http/parseBody';
+import { applySecurityHeaders } from '../../server/http/securityHeaders';
 
 interface ServerlessRequest {
   method?: string;

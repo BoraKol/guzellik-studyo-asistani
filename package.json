@@ -5,7 +5,7 @@
   "description": "Güzellik merkezleri için danışan kartları, geri çağırma radarı, randevu zaman çizelgesi, AI destekli işlem günlüğü ve Instagram Bio fiyat hesaplayıcı paneli.",
   "type": "module",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "dev": "tsx server.ts",
@@ -35,7 +35,6 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
-    "esbuild": "^0.25.0",
     "eslint": "^10.15.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",

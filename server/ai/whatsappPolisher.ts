@@ -3,9 +3,9 @@ import type {
   PolishWhatsAppApiResult,
   StudioTone,
   WhatsAppPurpose,
-} from '../../src/domain/types/studio.ts';
-import { HttpError, sanitizeText } from '../http/parseBody.ts';
-import { getGeminiClient } from './geminiClient.ts';
+} from '../../src/domain/types/studio';
+import { HttpError, sanitizeText } from '../http/parseBody';
+import { getGeminiClient } from './geminiClient';
 
 const POLISH_WHATSAPP_SYSTEM_INSTRUCTION = [
   'Sen bir Türkçe güzellik merkezi iletişim asistanısın.',

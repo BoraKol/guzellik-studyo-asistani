@@ -3,13 +3,13 @@ import type {
   NicheCategory,
   ParseSessionApiResult,
   TechnicalParams,
-} from '../../src/domain/types/studio.ts';
+} from '../../src/domain/types/studio';
 import {
   HttpError,
   sanitizeStringList,
   sanitizeText,
-} from '../http/parseBody.ts';
-import { getGeminiClient } from './geminiClient.ts';
+} from '../http/parseBody';
+import { getGeminiClient } from './geminiClient';
 
 const MAX_NOTE_LENGTH = 2500;
 
