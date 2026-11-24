@@ -1,0 +1,322 @@
+{
+  "entities": {
+    "StudioProfile": {
+      "title": "StudioProfile",
+      "description": "Güzellik merkezi stüdyo profili, çalışma saatleri ve varsayılan geri çağırma döngüleri.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Stüdyo sahibinin Firebase Auth UID değeri."
+        },
+        "studioName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "Güzellik merkezinin adı."
+        },
+        "instagramHandle": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "Stüdyonun Instagram kullanıcı adı."
+        },
+        "whatsappPhone": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Randevu ve teyit için WhatsApp telefon numarası."
+        },
+        "workingHours": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "Çalışma günleri ve saatleri."
+        },
+        "addressShort": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "Semt / ilçe bilgisi."
+        },
+        "bioSubtitle": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Bio linkinde görünen uzmanlık açıklaması."
+        },
+        "messageTone": {
+          "type": "string",
+          "enum": ["SAMIMI", "KURUMSAL"],
+          "description": "WhatsApp mesaj üslubu."
+        },
+        "defaultRecallDays": {
+          "type": "object",
+          "description": "Kategori bazlı varsayılan geri çağırma gün sayıları (lazer, cilt, tirnak, kasKirpik)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Oluşturulma sunucu zaman damgası."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Son güncelleme sunucu zaman damgası."
+        }
+      },
+      "required": [
+        "ownerId",
+        "studioName",
+        "instagramHandle",
+        "whatsappPhone",
+        "workingHours",
+        "addressShort",
+        "bioSubtitle",
+        "messageTone",
+        "defaultRecallDays",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StudioService": {
+      "title": "StudioService",
+      "description": "Güzellik merkezi hizmet kataloğu ve Bio fiyat kalemi.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "category": {
+          "type": "string",
+          "enum": ["LAZER_CILT", "TIRNAK_KAS_KIRPIK"]
+        },
+        "bioGroup": {
+          "type": "string",
+          "enum": ["LAZER_EPILASYON", "CILT_BAKIMI", "PROTEZ_TIRNAK_OJE", "KAS_KIRPIK"]
+        },
+        "price": {
+          "type": "number"
+        },
+        "priceMax": {
+          "type": "number"
+        },
+        "durationMinutes": {
+          "type": "number"
+        },
+        "defaultRecallDays": {
+          "type": "number"
+        },
+        "showInBio": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "name",
+        "category",
+        "bioGroup",
+        "price",
+        "durationMinutes",
+        "defaultRecallDays",
+        "showInBio",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StudioClient": {
+      "title": "StudioClient",
+      "description": "Yalnızca stüdyo sahibinin erişebildiği danışan kartı, paket sayacı, teknik formül geçmişi ve öncesi/sonrası bağlantıları.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "primaryCategory": {
+          "type": "string",
+          "enum": ["LAZER_CILT", "TIRNAK_KAS_KIRPIK"]
+        },
+        "allergyNote": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "createdDate": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "lastVisitDate": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "lastServiceName": {
+          "type": "string",
+          "maxLength": 140
+        },
+        "nextRecallDate": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "recallCycleDays": {
+          "type": "number"
+        },
+        "lastRemindedAt": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "activePackage": {
+          "type": "object"
+        },
+        "sessions": {
+          "type": "array",
+          "description": "En fazla 50 son seans kaydı."
+        },
+        "beforeAfterPhotos": {
+          "type": "array",
+          "description": "Firebase Storage HTTPS bağlantıları (en fazla 20 karşılaştırma)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "name",
+        "phone",
+        "primaryCategory",
+        "createdDate",
+        "lastVisitDate",
+        "lastServiceName",
+        "nextRecallDate",
+        "recallCycleDays",
+        "sessions",
+        "beforeAfterPhotos",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StudioAppointment": {
+      "title": "StudioAppointment",
+      "description": "Güzellik merkezi günlük/yarınki randevu ve gelmeme (No-Show) teyit kaydı.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "clientId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "clientName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "date": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "time": {
+          "type": "string",
+          "maxLength": 8
+        },
+        "serviceName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "category": {
+          "type": "string",
+          "enum": ["LAZER_CILT", "TIRNAK_KAS_KIRPIK"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["TEYIT_BEKLIYOR", "ONAYLANDI", "IPTAL_ERTELENDI"]
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "clientName",
+        "phone",
+        "date",
+        "time",
+        "serviceName",
+        "category",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/studios/{studioId}": {
+      "schema": { "$ref": "#/entities/StudioProfile" },
+      "description": "Stüdyo profili ve ayarları. studioId her zaman oturum açan stüdyo sahibinin UID'sine eşittir."
+    },
+    "/studios/{studioId}/services/{serviceId}": {
+      "schema": { "$ref": "#/entities/StudioService" },
+      "description": "Stüdyonun hizmet kataloğu ve Bio linki fiyat listesi."
+    },
+    "/studios/{studioId}/clients/{clientId}": {
+      "schema": { "$ref": "#/entities/StudioClient" },
+      "description": "Kişisel veri (telefon, alerji notu) içeren danışan kartları; yalnızca stüdyo sahibine açıktır."
+    },
+    "/studios/{studioId}/appointments/{appointmentId}": {
+      "schema": { "$ref": "#/entities/StudioAppointment" },
+      "description": "Bugünkü ve yarınki randevular ile gelmeme (No-Show) teyit durumları."
+    }
+  }
+}

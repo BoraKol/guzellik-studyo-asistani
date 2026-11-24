@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Global default-deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // Owner-isolated Before/After studio photos (max 5MB, image/* only)
+    match /studios/{studioId}/before-after/{clientId}/{fileName} {
+      allow read: if request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.uid == studioId;
+
+      allow write: if request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.uid == studioId
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

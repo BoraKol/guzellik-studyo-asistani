@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+dist/
+coverage/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Local & Editor artifacts
+.DS_Store
+Thumbs.db
+*.log
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.vercel/
+.firebase/

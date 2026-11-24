@@ -1,0 +1,350 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ---------------------------------------------------------
+    // Hardened Global Primitives
+    // ---------------------------------------------------------
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isStudioOwner(studioId) {
+      return isSignedIn() && request.auth.uid == studioId;
+    }
+
+    function studioExistsAndOwned(studioId) {
+      return exists(/databases/$(database)/documents/studios/$(studioId)) &&
+        get(/databases/$(database)/documents/studios/$(studioId)).data.ownerId == request.auth.uid;
+    }
+
+    function isValidOptionalString(data, key, maxLen) {
+      return !(key in data) || (data[key] is string && data[key].size() <= maxLen);
+    }
+
+    function isValidOptionalNumber(data, key, minVal, maxVal) {
+      return !(key in data) || (data[key] is number && data[key] >= minVal && data[key] <= maxVal);
+    }
+
+    // ---------------------------------------------------------
+    // Entity Validation Blueprints (Anti-Update-Gap)
+    // ---------------------------------------------------------
+    function isValidRecallDays(rd) {
+      return rd is map &&
+        rd.keys().hasAll(['lazer', 'cilt', 'tirnak', 'kasKirpik']) &&
+        rd.keys().hasOnly(['lazer', 'cilt', 'tirnak', 'kasKirpik']) &&
+        rd.lazer is number && rd.lazer >= 7 && rd.lazer <= 120 &&
+        rd.cilt is number && rd.cilt >= 7 && rd.cilt <= 120 &&
+        rd.tirnak is number && rd.tirnak >= 7 && rd.tirnak <= 120 &&
+        rd.kasKirpik is number && rd.kasKirpik >= 7 && rd.kasKirpik <= 120;
+    }
+
+    function isValidStudio(data, studioId) {
+      return data.keys().hasAll([
+          'ownerId', 'studioName', 'instagramHandle', 'whatsappPhone',
+          'workingHours', 'addressShort', 'bioSubtitle', 'messageTone',
+          'defaultRecallDays', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'studioName', 'instagramHandle', 'whatsappPhone',
+          'workingHours', 'addressShort', 'bioSubtitle', 'messageTone',
+          'defaultRecallDays', 'createdAt', 'updatedAt'
+        ]) &&
+        data.ownerId is string && data.ownerId == request.auth.uid && data.ownerId == studioId &&
+        data.studioName is string && data.studioName.size() >= 1 && data.studioName.size() <= 120 &&
+        data.instagramHandle is string && data.instagramHandle.size() <= 80 &&
+        data.whatsappPhone is string && data.whatsappPhone.size() <= 32 &&
+        data.workingHours is string && data.workingHours.size() <= 120 &&
+        data.addressShort is string && data.addressShort.size() <= 120 &&
+        data.bioSubtitle is string && data.bioSubtitle.size() <= 200 &&
+        data.messageTone in ['SAMIMI', 'KURUMSAL'] &&
+        isValidRecallDays(data.defaultRecallDays) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidService(data, studioId) {
+      return data.keys().hasAll([
+          'ownerId', 'name', 'category', 'bioGroup', 'price',
+          'durationMinutes', 'defaultRecallDays', 'showInBio',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'name', 'category', 'bioGroup', 'price', 'priceMax',
+          'durationMinutes', 'defaultRecallDays', 'showInBio', 'description',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.ownerId is string && data.ownerId == request.auth.uid && data.ownerId == studioId &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 140 &&
+        data.category in ['LAZER_CILT', 'TIRNAK_KAS_KIRPIK'] &&
+        data.bioGroup in ['LAZER_EPILASYON', 'CILT_BAKIMI', 'PROTEZ_TIRNAK_OJE', 'KAS_KIRPIK'] &&
+        data.price is number && data.price > 0 && data.price <= 500000 &&
+        isValidOptionalNumber(data, 'priceMax', 0, 500000) &&
+        data.durationMinutes is number && data.durationMinutes >= 5 && data.durationMinutes <= 600 &&
+        data.defaultRecallDays is number && data.defaultRecallDays >= 7 && data.defaultRecallDays <= 180 &&
+        data.showInBio is bool &&
+        isValidOptionalString(data, 'description', 240) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidOptionalPackage(data) {
+      return !('activePackage' in data) || (
+        data.activePackage is map &&
+        data.activePackage.keys().hasAll([
+          'id', 'name', 'category', 'totalSessions',
+          'completedSessions', 'paymentStatus', 'startDate'
+        ]) &&
+        data.activePackage.keys().hasOnly([
+          'id', 'name', 'category', 'totalSessions',
+          'completedSessions', 'paymentStatus', 'startDate', 'totalPrice'
+        ]) &&
+        data.activePackage.id is string && data.activePackage.id.size() >= 1 && data.activePackage.id.size() <= 128 &&
+        data.activePackage.name is string && data.activePackage.name.size() >= 1 && data.activePackage.name.size() <= 140 &&
+        data.activePackage.category in ['LAZER_CILT', 'TIRNAK_KAS_KIRPIK'] &&
+        data.activePackage.totalSessions is number && data.activePackage.totalSessions >= 1 && data.activePackage.totalSessions <= 50 &&
+        data.activePackage.completedSessions is number && data.activePackage.completedSessions >= 0 && data.activePackage.completedSessions <= data.activePackage.totalSessions &&
+        data.activePackage.paymentStatus in ['ODENDI', 'KISMI', 'SEANS_BASI'] &&
+        data.activePackage.startDate is string && data.activePackage.startDate.size() <= 16 &&
+        isValidOptionalNumber(data.activePackage, 'totalPrice', 0, 1000000)
+      );
+    }
+
+    function isValidSessionsArray(sessions) {
+      return sessions is list && sessions.size() <= 50 && (
+        sessions.size() == 0 || (
+          sessions[0] is map &&
+          sessions[0].id is string && sessions[0].id.size() <= 128 &&
+          sessions[0].serviceName is string && sessions[0].serviceName.size() <= 140
+        )
+      );
+    }
+
+    function isValidBeforeAfterArray(photos) {
+      return photos is list && photos.size() <= 20 && (
+        photos.size() == 0 || (
+          photos[0] is map &&
+          photos[0].id is string && photos[0].id.size() <= 128 &&
+          photos[0].beforeUrl is string && photos[0].beforeUrl.size() <= 2048 &&
+          photos[0].afterUrl is string && photos[0].afterUrl.size() <= 2048
+        )
+      );
+    }
+
+    function isValidClient(data, studioId) {
+      return data.keys().hasAll([
+          'ownerId', 'name', 'phone', 'primaryCategory', 'createdDate',
+          'lastVisitDate', 'lastServiceName', 'nextRecallDate', 'recallCycleDays',
+          'sessions', 'beforeAfterPhotos', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'name', 'phone', 'primaryCategory', 'allergyNote', 'createdDate',
+          'lastVisitDate', 'lastServiceName', 'nextRecallDate', 'recallCycleDays',
+          'lastRemindedAt', 'activePackage', 'sessions', 'beforeAfterPhotos',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.ownerId is string && data.ownerId == request.auth.uid && data.ownerId == studioId &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 120 &&
+        data.phone is string && data.phone.size() <= 32 &&
+        data.primaryCategory in ['LAZER_CILT', 'TIRNAK_KAS_KIRPIK'] &&
+        isValidOptionalString(data, 'allergyNote', 300) &&
+        data.createdDate is string && data.createdDate.size() <= 16 &&
+        data.lastVisitDate is string && data.lastVisitDate.size() <= 16 &&
+        data.lastServiceName is string && data.lastServiceName.size() <= 140 &&
+        data.nextRecallDate is string && data.nextRecallDate.size() <= 16 &&
+        data.recallCycleDays is number && data.recallCycleDays >= 7 && data.recallCycleDays <= 180 &&
+        isValidOptionalString(data, 'lastRemindedAt', 16) &&
+        isValidOptionalPackage(data) &&
+        isValidSessionsArray(data.sessions) &&
+        isValidBeforeAfterArray(data.beforeAfterPhotos) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAppointment(data, studioId) {
+      return data.keys().hasAll([
+          'ownerId', 'clientName', 'phone', 'date', 'time',
+          'serviceName', 'category', 'status', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId', 'clientId', 'clientName', 'phone', 'date', 'time',
+          'serviceName', 'category', 'status', 'notes', 'createdAt', 'updatedAt'
+        ]) &&
+        data.ownerId is string && data.ownerId == request.auth.uid && data.ownerId == studioId &&
+        isValidOptionalString(data, 'clientId', 128) &&
+        data.clientName is string && data.clientName.size() >= 1 && data.clientName.size() <= 120 &&
+        data.phone is string && data.phone.size() <= 32 &&
+        data.date is string && data.date.size() <= 16 &&
+        data.time is string && data.time.size() <= 8 &&
+        data.serviceName is string && data.serviceName.size() >= 1 && data.serviceName.size() <= 140 &&
+        data.category in ['LAZER_CILT', 'TIRNAK_KAS_KIRPIK'] &&
+        data.status in ['TEYIT_BEKLIYOR', 'ONAYLANDI', 'IPTAL_ERTELENDI'] &&
+        isValidOptionalString(data, 'notes', 300) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // ---------------------------------------------------------
+    // Collection 1: /studios/{studioId}
+    // ---------------------------------------------------------
+    match /studios/{studioId} {
+      allow get: if isStudioOwner(studioId) && isValidId(studioId) && (resource == null || existing().ownerId == request.auth.uid);
+      allow list: if false;
+
+      allow create: if isStudioOwner(studioId) &&
+        isValidId(studioId) &&
+        isValidStudio(incoming(), studioId) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isStudioOwner(studioId) &&
+        isValidId(studioId) &&
+        isValidStudio(incoming(), studioId) &&
+        existing().ownerId == request.auth.uid &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'studioName', 'instagramHandle', 'whatsappPhone', 'workingHours',
+          'addressShort', 'bioSubtitle', 'messageTone', 'defaultRecallDays', 'updatedAt'
+        ]);
+
+      allow delete: if isStudioOwner(studioId) && isValidId(studioId) && existing().ownerId == request.auth.uid;
+
+      // ---------------------------------------------------------
+      // Collection 2: /studios/{studioId}/services/{serviceId}
+      // ---------------------------------------------------------
+      match /services/{serviceId} {
+        allow get: if isStudioOwner(studioId) && isValidId(studioId) && isValidId(serviceId) && (resource == null || existing().ownerId == request.auth.uid);
+        allow list: if isStudioOwner(studioId) && existing().ownerId == request.auth.uid;
+
+        allow create: if isStudioOwner(studioId) &&
+          isValidId(studioId) &&
+          isValidId(serviceId) &&
+          isValidService(incoming(), studioId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          studioExistsAndOwned(studioId);
+
+        allow update: if isStudioOwner(studioId) &&
+          isValidId(studioId) &&
+          isValidId(serviceId) &&
+          isValidService(incoming(), studioId) &&
+          existing().ownerId == request.auth.uid &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          studioExistsAndOwned(studioId) &&
+          (
+            // Action: Toggle Bio visibility
+            incoming().diff(existing()).affectedKeys().hasOnly(['showInBio', 'updatedAt']) ||
+            // Action: Edit service details
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'name', 'category', 'bioGroup', 'price', 'priceMax',
+              'durationMinutes', 'defaultRecallDays', 'showInBio', 'description', 'updatedAt'
+            ])
+          );
+
+        allow delete: if isStudioOwner(studioId) && isValidId(studioId) && isValidId(serviceId) && existing().ownerId == request.auth.uid;
+      }
+
+      // ---------------------------------------------------------
+      // Collection 3: /studios/{studioId}/clients/{clientId} (PII Isolated)
+      // ---------------------------------------------------------
+      match /clients/{clientId} {
+        allow get: if isStudioOwner(studioId) && isValidId(studioId) && isValidId(clientId) && (resource == null || existing().ownerId == request.auth.uid);
+        allow list: if isStudioOwner(studioId) && existing().ownerId == request.auth.uid;
+
+        allow create: if isStudioOwner(studioId) &&
+          isValidId(studioId) &&
+          isValidId(clientId) &&
+          isValidClient(incoming(), studioId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          studioExistsAndOwned(studioId);
+
+        allow update: if isStudioOwner(studioId) &&
+          isValidId(studioId) &&
+          isValidId(clientId) &&
+          isValidClient(incoming(), studioId) &&
+          existing().ownerId == request.auth.uid &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          studioExistsAndOwned(studioId) &&
+          (
+            // Action: Mark recall reminded
+            incoming().diff(existing()).affectedKeys().hasOnly(['lastRemindedAt', 'updatedAt']) ||
+            // Action: Update package counter or payment status
+            incoming().diff(existing()).affectedKeys().hasOnly(['activePackage', 'updatedAt']) ||
+            // Action: Add Before/After photo pair
+            incoming().diff(existing()).affectedKeys().hasOnly(['beforeAfterPhotos', 'updatedAt']) ||
+            // Action: Log session & update recall cycle
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'lastVisitDate', 'lastServiceName', 'nextRecallDate', 'recallCycleDays',
+              'lastRemindedAt', 'activePackage', 'sessions', 'updatedAt'
+            ]) ||
+            // Action: Edit client profile details
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'name', 'phone', 'primaryCategory', 'allergyNote', 'recallCycleDays', 'updatedAt'
+            ])
+          );
+
+        allow delete: if isStudioOwner(studioId) && isValidId(studioId) && isValidId(clientId) && existing().ownerId == request.auth.uid;
+      }
+
+      // ---------------------------------------------------------
+      // Collection 4: /studios/{studioId}/appointments/{appointmentId} (PII Isolated)
+      // ---------------------------------------------------------
+      match /appointments/{appointmentId} {
+        allow get: if isStudioOwner(studioId) && isValidId(studioId) && isValidId(appointmentId) && (resource == null || existing().ownerId == request.auth.uid);
+        allow list: if isStudioOwner(studioId) && existing().ownerId == request.auth.uid;
+
+        allow create: if isStudioOwner(studioId) &&
+          isValidId(studioId) &&
+          isValidId(appointmentId) &&
+          isValidAppointment(incoming(), studioId) &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          studioExistsAndOwned(studioId);
+
+        allow update: if isStudioOwner(studioId) &&
+          isValidId(studioId) &&
+          isValidId(appointmentId) &&
+          isValidAppointment(incoming(), studioId) &&
+          existing().ownerId == request.auth.uid &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          studioExistsAndOwned(studioId) &&
+          (
+            // Action: Update No-Show confirmation status
+            incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) ||
+            // Action: Reschedule or edit appointment
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'date', 'time', 'serviceName', 'category', 'status', 'notes', 'updatedAt'
+            ])
+          );
+
+        allow delete: if isStudioOwner(studioId) && isValidId(studioId) && isValidId(appointmentId) && existing().ownerId == request.auth.uid;
+      }
+    }
+  }
+}
