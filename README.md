@@ -25,7 +25,7 @@ Lazer Epilasyon · Klinik Cilt Bakımı · Protez Tırnak & Kalıcı Oje · Kaş
 
 | Ortam | Adres | Durum |
 | :--- | :--- | :--- |
-| **Canlı Uygulama (Web & Mobil)** | **[https://studyoasistani.vercel.app](https://studyoasistani.vercel.app)** | Yayına Hazır |
+| **Canlı Uygulama (Web & Mobil)** | **[https://guzellik-studyo-asistani.vercel.app/](https://guzellik-studyo-asistani.vercel.app/)** | Yayına Hazır |
 | **Sağlık Kontrolü (API)** | `GET /api/health` | Sunucu Taraflı |
 
 > [!TIP]
